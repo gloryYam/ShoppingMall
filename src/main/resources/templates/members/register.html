@@ -103,7 +103,6 @@
               <div class="field-error" th:errors="*{name}"></div>
             </td>
           </tr>
-          <tr>
             <th><span>비밀번호</span></th>
             <td>
               <input class="table_input" type="password" id="password1" th:field="*{password1}" placeholder="비밀번호를 입력해주세요">
@@ -144,7 +143,7 @@
           <span>표시는 필수적으로 입력해주셔야 가입이 가능합니다.</span>
         </div>
         <div class="btn_wrap">
-          <button type="button" id="submit_join" class="btn btn-dark submit_join">가입하기</button>
+          <button id="check_join" class="btn btn-dark" type="button">가입하기</button>
         </div>
       </form> <!-- join_form E -->
     </div> <!-- form_txtInput E -->
