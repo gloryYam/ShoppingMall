@@ -1,7 +1,6 @@
 package shop.jpashop.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import shop.jpashop.domain.member.dto.EmailRequest;
@@ -9,6 +8,7 @@ import shop.jpashop.domain.member.dto.MemberFormDto;
 import shop.jpashop.domain.member.entity.Address;
 import shop.jpashop.domain.member.entity.Member;
 import shop.jpashop.domain.member.entity.MemberRole;
+import shop.jpashop.web.CommonUserDetails;
 
 @Component
 @RequiredArgsConstructor
@@ -31,8 +31,8 @@ public class MemberFacade {
     /**
      * 회원 수정 폼
      */
-    public MemberFormDto updateForm(User user) {
-        String userEmail = user.getUsername();
+    public MemberFormDto updateForm(CommonUserDetails user) {
+        String userEmail = user.getEmail();
         Member member = memberService.findMember(userEmail);
         return toDto(member);
     }
@@ -41,10 +41,10 @@ public class MemberFacade {
      * 회원 수정 업데이트
      */
     @Transactional
-    public String update(MemberFormDto memberForm) {
+    public Long update(MemberFormDto memberForm) {
         Address address = toAddress(memberForm);
         Member member = toEntity(memberForm, address);
-        return memberService.update(member.getEmail(), member);
+        return memberService.update(member);
     }
 
     /**
@@ -104,4 +104,5 @@ public class MemberFacade {
                 .detail_address(member.getAddress().getDetail_address())
                 .build();
     }
+
 }

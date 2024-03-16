@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import shop.jpashop.domain.common.Pages;
 import shop.jpashop.domain.qna.dto.AnswerFormDto;
 import shop.jpashop.domain.qna.service.QnAFacade;
+import shop.jpashop.web.CommonUserDetails;
+import shop.jpashop.web.anotation.CurrentUser;
 
 @Slf4j
 @Controller
@@ -29,7 +31,7 @@ public class AnswerController {
 
     @PostMapping("/new/{questionId}")
     public String register(@PathVariable Long questionId,
-                           @AuthenticationPrincipal User user,
+                           @CurrentUser CommonUserDetails userDetails,
                            @RequestParam(defaultValue = "0") int page,
                            @Valid @ModelAttribute AnswerFormDto answerFormDto,
                            BindingResult bindingResult,
@@ -42,13 +44,13 @@ public class AnswerController {
             model.addAttribute("questionFormDto", qnAFacade.toDto(questionId));
             model.addAttribute("answers", answers);
             model.addAttribute("pages", pages.getPages());
-            model.addAttribute("checkRole", qnAFacade.isAuthorized(questionId, user));
+            model.addAttribute("checkRole", qnAFacade.isAuthorized(questionId, userDetails));
 
             return "qna/detail-view";
 
         }
 
-        qnAFacade.answerRegister(user, questionId, answerFormDto);
+        qnAFacade.answerRegister(userDetails, questionId, answerFormDto);
         return String.format("redirect:/qna/%s", questionId);
     }
 

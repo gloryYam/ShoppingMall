@@ -5,16 +5,25 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
-  output:
-    ansi:
-      enabled: always
-
   jpa:
     hibernate:
       ddl-auto: none
     properties:
       hibernate:
         format_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          timeout: 5000
 
   servlet:
     multipart:
@@ -26,3 +35,10 @@ logging:
     com.amazonaws.util.EC2MetadataUtils: ERROR
     org.hibernate.SQL: debug
 
+---
+spring:
+  profiles:
+    include:
+    - oauth
+    - jwt
+    - secret

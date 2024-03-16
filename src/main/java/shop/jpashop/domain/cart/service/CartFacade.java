@@ -1,9 +1,5 @@
 package shop.jpashop.domain.cart.service;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
@@ -16,6 +12,11 @@ import shop.jpashop.domain.item.entity.Image;
 import shop.jpashop.domain.item.entity.Item;
 import shop.jpashop.domain.item.service.ItemService;
 import shop.jpashop.domain.item.service.S3Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
 @RequiredArgsConstructor

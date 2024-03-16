@@ -1,8 +1,7 @@
 package shop.jpashop.domain.member.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,27 +18,26 @@ import shop.jpashop.domain.member.repository.MemberRepository;
 @RequiredArgsConstructor
 public class MemberSecurityService implements UserDetailsService {
 
-    private final MemberRepository repository;
+    private final MemberRepository memberRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<Member> _member = this.repository.findByEmail(email);
+        Member member = memberRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("해당 이메일이 존재하지 않습니다."));
 
-        if (_member.isEmpty()) {
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
-        }
+        List<GrantedAuthority> role = new ArrayList<>();
 
-        Member member = _member.get();
-
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        if ("dudrhkd3892@gmail.com".equals(email)) {
-            authorities.add(new SimpleGrantedAuthority(MemberRole.ADMIN.getValue()));
+        if("dudrhkd4179@naver.com".equals(email)) {
+            role.add(new SimpleGrantedAuthority(MemberRole.ADMIN.getKey()));
         } else {
-            authorities.add(new SimpleGrantedAuthority(MemberRole.USER.getValue()));
+            role.add(new SimpleGrantedAuthority(MemberRole.USER.getKey()));
         }
 
-        return new User(member.getEmail(), member.getPassword(), authorities);
+        return User.builder()
+            .username(member.getEmail())
+            .password(member.getPassword())
+            .roles(member.getRole().name())
+            .authorities(role)
+            .build();
     }
-
 }

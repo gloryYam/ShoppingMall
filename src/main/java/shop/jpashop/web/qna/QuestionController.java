@@ -30,6 +30,9 @@ import shop.jpashop.domain.qna.dto.QuestionSaveFormDto;
 import shop.jpashop.domain.qna.dto.QuestionSearchCondition;
 import shop.jpashop.domain.qna.dto.QuestionSearchDto;
 import shop.jpashop.domain.qna.service.QnAFacade;
+import shop.jpashop.oauth.CustomOAuth2User;
+import shop.jpashop.web.CommonUserDetails;
+import shop.jpashop.web.anotation.CurrentUser;
 
 @Slf4j
 @Controller
@@ -48,12 +51,12 @@ public class QuestionController {
     @PostMapping("/new")
     public String newQuestion(@Valid @ModelAttribute QuestionSaveFormDto questionSaveFormDto,
                               BindingResult bindingResult,
-                              @AuthenticationPrincipal User user) {
+                              @CurrentUser CommonUserDetails userDetails) {
         if (bindingResult.hasErrors()) {
             log.info("bindingResult={}", bindingResult);
             return "qna/register";
         }
-        qnAFacade.questionRegister(questionSaveFormDto, user);
+        qnAFacade.questionRegister(questionSaveFormDto, userDetails);
         return "redirect:/qna";
     }
 
@@ -74,7 +77,7 @@ public class QuestionController {
                           Model model,
                           @RequestParam(defaultValue = "0") int page,
                           @ModelAttribute AnswerFormDto answerFormDto,
-                          @AuthenticationPrincipal User user) {
+                          @CurrentUser CommonUserDetails userDetails) {
         Page<AnswerFormDto> answers = qnAFacade.findAnswersByQuestionId(questionId, page);
         Pages<AnswerFormDto> pages = Pages.of(answers, 4);
 
@@ -82,20 +85,20 @@ public class QuestionController {
         model.addAttribute("questionFormDto", questionFormDto);
         model.addAttribute("answers", answers);
         model.addAttribute("pages", pages.getPages());
-        model.addAttribute("checkRole", qnAFacade.isAuthorized(questionId, user));
+        model.addAttribute("checkRole", qnAFacade.isAuthorized(questionId, userDetails));
         return "qna/detail-view";
     }
 
     @GetMapping("/{questionId}/update")
     public String updateForm(@PathVariable Long questionId,
                              Model model,
-                             @AuthenticationPrincipal User user) {
-        if (!qnAFacade.isAuthorized(questionId, user)) {
+                             @CurrentUser CommonUserDetails userDetails) {
+        if (!qnAFacade.isAuthorized(questionId, userDetails)) {
             return String.format("redirect:/qna/%s", questionId);
         }
 
         model.addAttribute("questionFormDto", qnAFacade.toDto(questionId));
-        model.addAttribute("checkRole", qnAFacade.isAuthorized(questionId, user));
+        model.addAttribute("checkRole", qnAFacade.isAuthorized(questionId, userDetails));
         return "qna/update";
     }
 
@@ -110,8 +113,8 @@ public class QuestionController {
     @PostMapping("/{questionId}/delete")
     public String delete(@PathVariable Long questionId,
                          @ModelAttribute QuestionFormDto questionFormDto,
-                         @AuthenticationPrincipal User user) {
-        if (qnAFacade.isAuthorized(questionId, user)) {
+                         @CurrentUser CommonUserDetails userDetails) {
+        if (qnAFacade.isAuthorized(questionId, userDetails)) {
             qnAFacade.deleteQuestion(questionId);
         }
         return "redirect:/qna";

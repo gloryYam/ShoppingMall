@@ -6,3 +6,16 @@ spring:
         format_sql: true
   profiles:
     include: security
+
+
+cloud:
+  aws:
+    s3:
+      bucket: young.first.bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      access-key: AKIA2K5UFUSBKYG7PZMT
+      secret-key: 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

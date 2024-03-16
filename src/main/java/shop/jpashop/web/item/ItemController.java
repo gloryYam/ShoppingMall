@@ -66,9 +66,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public String list(Model model,
-                       @ModelAttribute ItemSearchCondition itemSearchCondition,
-                       Pageable pageable) throws IOException {
+    public String list(Model model, @ModelAttribute ItemSearchCondition itemSearchCondition, Pageable pageable) throws IOException {
         Category[] categories = Category.values();
 
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), 12); // 한 페이지에 12개씩(4*3)

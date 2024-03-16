@@ -1,6 +1,5 @@
 package shop.jpashop.web.member;
 
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,18 +11,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import shop.jpashop.domain.member.dto.EmailRequest;
 import shop.jpashop.domain.member.dto.MemberFormDto;
 import shop.jpashop.domain.member.service.MemberFacade;
+import shop.jpashop.jwt.service.JwtService;
+import shop.jpashop.web.CommonUserDetails;
+import shop.jpashop.web.anotation.CurrentUser;
+
+import javax.validation.Valid;
 import java.net.URI;
 
 @Slf4j
@@ -33,6 +30,7 @@ import java.net.URI;
 public class MemberController {
 
     private final MemberFacade memberFacade;
+    private final JwtService jwtService;
 
     /**
      * 회원 가입
@@ -44,7 +42,7 @@ public class MemberController {
         return "members/register";
     }
 
-    @ResponseBody
+
     @PostMapping("/new")
     public ResponseEntity<String> newMember(@RequestBody @Valid MemberFormDto memberFormDto, BindingResult bindingResult) {
         log.info(String.valueOf(memberFormDto));
@@ -82,6 +80,8 @@ public class MemberController {
         }
     }
 
+
+
     /**
      * 이메일 전송
      */
@@ -93,13 +93,10 @@ public class MemberController {
         return new ResponseEntity<>(authKey, HttpStatus.OK);
     }
 
-    /**
-     * 로그인
-     */
     @GetMapping("/login")
     public String loginForm() {
         log.info("member login controller");
-        return "members/login-form";
+        return "/members/login-form";
     }
 
     /**
@@ -107,16 +104,17 @@ public class MemberController {
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/update")
-    public String editMemberForm(@AuthenticationPrincipal User user, Model model) {
+    public String editMemberForm(@CurrentUser CommonUserDetails user, Model model) {
         log.info("회원 수정 폼으로 이동");
         model.addAttribute("memberForm", memberFacade.updateForm(user));
+        // 데이터 무결성, 유연성
 
         return "members/update";
     }
 
-    @ResponseBody
-    @PutMapping("/update")
-    public ResponseEntity editMember(@RequestBody @Valid MemberFormDto memberForm, BindingResult bindingResult) {
+
+    @PostMapping("/update")
+    public ResponseEntity editMember(@Valid @RequestBody MemberFormDto memberForm, BindingResult bindingResult) {
         log.info("member update-form controller");
         log.info(String.valueOf(memberForm));
 
@@ -133,7 +131,7 @@ public class MemberController {
             for (FieldError error : bindingResult.getFieldErrors())
                 sb.append(error.getDefaultMessage());
 
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(sb.toString(), HttpStatus.BAD_REQUEST);
         } else {
             memberFacade.update(memberForm);
 
@@ -144,7 +142,7 @@ public class MemberController {
                     .toUri();
 
             // 성공 시 201
-            return ResponseEntity.created(location).build();
+            return ResponseEntity.ok(location);
         }
     }
 
@@ -158,11 +156,12 @@ public class MemberController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@AuthenticationPrincipal User user) {
+    public ResponseEntity<String> delete(@CurrentUser CommonUserDetails user) {
         log.info("member delete controller");
-        memberFacade.delete(user.getUsername());
+        memberFacade.delete(user.getEmail());
 
         // 성공 시 200
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }

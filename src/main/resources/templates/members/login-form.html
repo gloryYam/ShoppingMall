@@ -6,6 +6,27 @@
 <!-- ======= Header ======= -->
 <header th:replace="fragments/body-header :: body-header" id="header" class="fixed-top d-flex align-items-center"></header>
 
+<script>
+    // 로그인 버튼 이벤트 핸들러
+    document.getElementById("loginButton").addEventListener("click", function() {
+        axios.post('/members/login', {
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value
+        })
+            .then(function (response) {
+                // 토큰 저장
+                localStorage.setItem("accessToken", response.data.accessToken);
+                localStorage.setItem("refreshToken", response.data.refreshToken);
+                // 로그인 성공 처리, 예: 홈페이지로 리다이렉트
+                window.location.href = '/';
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    });
+
+</script>
+
 <!-- ======= Login Section ======= -->
 <section class="common">
   <div layout:fragment="content" class="container">
@@ -25,7 +46,13 @@
           <label for="password" class="form-label">비밀번호</label>
           <input type="password" name="password" id="password" class="form-control">
         </div>
-        <button type="submit" class="btn btn-dark login-btn">로그인</button>
+          <button type="button" id="loginButton" class="btn btn-dark login-btn">로그인</button>
+          <div>
+              <div>
+                  <a href="/oauth2/authorization/google" class="btn btn-sm btn-primary" style="background-color: #4285F4; border-color: #4285F4;" role="button">Google Login</a><br>
+              </div>
+
+          </div>
       </form>
     </div>
   </div>

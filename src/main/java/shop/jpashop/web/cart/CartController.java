@@ -1,8 +1,5 @@
 package shop.jpashop.web.cart;
 
-import java.net.URI;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,16 +10,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import shop.jpashop.domain.cart.dto.CartItemDto;
 import shop.jpashop.domain.cart.dto.CartListDto;
 import shop.jpashop.domain.cart.service.CartFacade;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -36,8 +32,8 @@ public class CartController {
      * 장바구니에 상품 담기
      */
     @PostMapping
-    public @ResponseBody
-    ResponseEntity<String> addCartItem(@Valid @ModelAttribute CartItemDto cartItemDto,
+    @ResponseBody
+    public ResponseEntity<String> addCartItem(@Valid @ModelAttribute CartItemDto cartItemDto,
                                        BindingResult bindingResult,
                                        @AuthenticationPrincipal User user) {
         log.info("장바구니에 담을 상품의 id = {}", cartItemDto.getItemId());

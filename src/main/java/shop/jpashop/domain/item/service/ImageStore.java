@@ -20,6 +20,7 @@ import shop.jpashop.domain.item.entity.ImageType;
 @Component
 @RequiredArgsConstructor
 public class ImageStore {
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
     private final AmazonS3Client amazonS3Client;
@@ -56,15 +57,15 @@ public class ImageStore {
 
         storeS3(multipartFile, storeFileName);
 
-        return Image.of(originFileName, storeFileName, type);   // 정보 저장, 레이어 분리
+        return Image.of(originFileName, storeFileName, type);
     }
 
     /**
      * aws S3에 이미지 파일 저장
      */
     private void storeS3(MultipartFile multipartFile, String storeFileName) {
-        File file = new File(getFullPath(storeFileName)); // multipartFile -> File 변환
-        //MultipartFile 을 파일로 변환하는 이유는 일반적으로 파일을 처리하는 라이브러리나 기능들이 MultipartFile 대신 File 객체를 요구하기 때문
+        File file = new File(getFullPath(storeFileName));
+
         try {
             multipartFile.transferTo(file);
             amazonS3Client.putObject(new PutObjectRequest(bucket, storeFileName, file)
@@ -114,6 +115,7 @@ public class ImageStore {
 
     /**
      * 파일 확장자 추출
+     * apple.jpg
      */
     private String extracted(String originFileName) {
         int pos = originFileName.lastIndexOf(".");

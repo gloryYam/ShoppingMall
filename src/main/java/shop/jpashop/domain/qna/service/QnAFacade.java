@@ -20,6 +20,7 @@ import shop.jpashop.domain.qna.dto.QuestionSearchCondition;
 import shop.jpashop.domain.qna.dto.QuestionSearchDto;
 import shop.jpashop.domain.qna.entity.Answer;
 import shop.jpashop.domain.qna.entity.Question;
+import shop.jpashop.web.CommonUserDetails;
 
 @Component
 @RequiredArgsConstructor
@@ -31,8 +32,9 @@ public class QnAFacade {
     private final MemberService memberService;
 
     @Transactional
-    public void questionRegister(QuestionSaveFormDto questionSaveFormDto, User user) {
-        String userEmail = user.getUsername();
+    public void questionRegister(QuestionSaveFormDto questionSaveFormDto, CommonUserDetails user) {
+        String userEmail = user.getEmail();
+
         Member member = memberService.findMember(userEmail);
 
         Question question = toEntity(questionSaveFormDto, member);
@@ -50,8 +52,8 @@ public class QnAFacade {
     }
 
     @Transactional
-    public void answerRegister(User user, Long questionId, AnswerFormDto answerFormDto) {
-        Member member = memberService.findMember(user.getUsername());
+    public void answerRegister(CommonUserDetails user, Long questionId, AnswerFormDto answerFormDto) {
+        Member member = memberService.findMember(user.getEmail());
         Question question = questionService.findOne(questionId);
         Answer answer = toEntity(answerFormDto, question, member);
         answerService.register(answer);
@@ -78,8 +80,8 @@ public class QnAFacade {
         questionService.delete(questionId);
     }
 
-    public boolean isAuthorized(Long questionId, User user) {
-        String userEmail = user.getUsername();
+    public boolean isAuthorized(Long questionId, CommonUserDetails user) {
+        String userEmail = user.getEmail();
         Member member = memberService.findMember(userEmail);
         Question question = questionService.findOne(questionId);
 
